@@ -20,7 +20,6 @@ Key Features:
 
 Highlight: Emphasis on security best practices and architectural decisions influenced by OCI certifications.
 
-Explore Project: [Secure Infrastructure Deployment](./Secure%20Infrastructure%20Deployment/)
 
 ---
 
