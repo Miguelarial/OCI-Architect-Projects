@@ -1,0 +1,13 @@
+# Monitoring Guide for Cloud Infrastructure Deployment
+
+## Overview
+This guide provides details on the monitoring setup for our OCI resources.
+
+## Monitoring Tools
+- OCI Monitoring Service
+
+## Alarms
+- CPU Utilization Alarm: Triggers if CPU usage exceeds 80% for 5 minutes.
+- Memory Utilization Alarm: Triggers if memory usage exceeds 90% for 5 minutes.
+
+

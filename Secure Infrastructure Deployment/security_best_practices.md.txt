@@ -1,0 +1,54 @@
+Security Best Practices for OCI Deployment
+
+This document outlines the security best practices implemented in Project 1 for deploying a secure cloud infrastructure on Oracle Cloud Infrastructure (OCI).
+
+1. Principle of Least Privilege (PoLP) with IAM
+- Description: Grant only the permissions necessary to perform a task.
+- Implementation in Project 1:
+  Created user groups with specific roles.
+  Attached policies to groups based on their responsibilities.
+
+2. Compartmentalization
+- Description: Use compartments to isolate resources.
+- Implementation in Project 1: 
+  Created a separate compartment for the project to ensure resources are isolated from the root and other compartments.
+
+3. Virtual Cloud Network (VCN) Configuration
+- Description: Properly configure VCNs to ensure network security.
+- Implementation in Project 1:
+  Deployed a VCN with proper CIDR block.
+  Created public and private subnets to segregate resources.
+  Configured an Internet Gateway for public access, ensuring only necessary resources are exposed.
+
+4. Security Lists and Network Security Groups
+- Description: Control inbound and outbound traffic to resources.
+- Implementation in Project 1:
+  - Configured security lists to allow SSH access only from specific IPs.
+  - Allowed all outbound traffic to ensure the instance can communicate with necessary services.
+
+5. Principle of Least Privilege (PoLP) with IAM
+- Description: Grant only the permissions necessary to perform a task.
+- Implementation in Project 1:
+  - Created user groups with specific roles.
+  - Attached policies to groups based on their responsibilities.
+
+6. Data Encryption
+- Description: Encrypt data at rest and in transit.
+- Implementation in Project 1:
+  - OCI ensures data encryption at rest for all storage services.
+  - Data in transit is encrypted using protocols like TLS.
+
+7. Monitoring and Alerts
+- Description: Monitor resources and set up alerts for anomalies.
+- Implementation in Project 1:
+  - Used OCI Monitoring to set up alarms for CPU and memory usage.
+  - Configured notifications to be sent to a specific email when alarms are triggered.
+
+8. SSH Key Pair for Instances
+- Description: Use SSH key pairs for secure access to instances.
+- Implementation in Project 1:
+  - Generated and used an SSH key pair for accessing the compute instance, ensuring only authorized users can access.
+
+Note: This document provides an overview of the security measures implemented in Project 1. Always refer to OCI's official documentation for a comprehensive list of best practices and ensure you stay updated with the latest security recommendations.
+
+

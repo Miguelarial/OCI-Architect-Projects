@@ -1,0 +1,56 @@
+# Setup Guide for Secure Cloud Infrastructure Deployment on OCI
+
+## Introduction
+This guide provides step-by-step instructions to design and deploy a secure cloud infrastructure using Oracle Cloud Infrastructure (OCI). By following this guide, you'll set up a Virtual Cloud Network (VCN), compute resources, data storage, and essential security configurations.
+
+## Prerequisites
+- An active OCI Free Tier account.
+- Basic knowledge of OCI services and CLI.
+- SSH key pair for accessing compute instances.
+
+## Table of Contents
+1. Initial Setup
+2. Network Design
+3. Compute Resources
+4. Data Storage
+5. Monitoring
+6. Cleanup
+
+### 1. Initial Setup
+#### Sign Up for OCI Free Tier
+- Visit the OCI website and sign up for a Free Tier account.
+
+#### IAM Configuration
+- Log in to the OCI Console.
+- Create a new compartment.
+- Set up user groups and policies.
+
+### 2. Network Design
+#### Virtual Cloud Network (VCN)
+- Create a new VCN in your compartment.
+- Configure CIDR blocks and subnets (public and private).
+
+#### Internet Gateway
+- Set up an Internet Gateway for public internet access.
+
+### 3. Compute Resources
+#### Launching an Instance
+- Launch a compute instance in the public subnet.
+- Configure the instance with essential packages and settings.
+
+### 4. Data Storage
+#### Block Volume
+- Create and attach a block volume to the compute instance.
+- Format and mount the block volume.
+
+### 5. Monitoring
+#### OCI Monitoring Service
+- Set up basic alarms for resource health monitoring.
+- Configure notifications for triggered alarms.
+
+### 6. Cleanup
+- Instructions on safely terminating resources after use to avoid unnecessary charges.
+
+## Conclusion
+By following this guide, you'll have a secure and functional cloud infrastructure setup on OCI. Ensure regular maintenance and updates to keep the environment secure and efficient.
+

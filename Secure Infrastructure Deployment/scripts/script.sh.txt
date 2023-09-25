@@ -1,0 +1,92 @@
+#!/bin/bash
+
+# Ensure OCI CLI is installed and configured
+if ! command -v oci &> /dev/null; then
+    echo "OCI CLI is not installed. Please install and configure it first."
+    exit 1
+fi
+
+# Function to prompt for input or use environment variable
+prompt_or_env() {
+    local prompt_message="$1"
+    local env_var_name="$2"
+    local input_value
+
+    echo "$prompt_message (or set the $env_var_name environment variable):"
+    read -r input_value
+    echo "${input_value:-${!env_var_name}}"
+}
+
+# Gather necessary values
+COMPARTMENT_ID=$(prompt_or_env "Please enter your Compartment ID" "OCI_COMPARTMENT_ID")
+EMAIL=$(prompt_or_env "Please enter your email for notifications" "OCI_EMAIL")
+
+# Check if essential values are set
+if [ -z "$COMPARTMENT_ID" ] || [ -z "$EMAIL" ]; then
+    echo "Error: Essential values are missing. Exiting."
+    exit 1
+fi
+
+# 1. Initial Setup
+echo "Setting up IAM Configuration"
+
+# Create a new compartment
+oci iam compartment create --name "MyNewCompartment" --description "Compartment for Project 1" --compartment-id "$COMPARTMENT_ID"
+
+# Create a new group for administrators
+GROUP_ID=$(oci iam group create --name "AdminGroup" --description "Group for Administrators" --compartment-id "$COMPARTMENT_ID" --query "data.id" --raw-output)
+
+# Add the user to the group (assuming the user's OCID is known)
+# oci iam group add-user --group-id $GROUP_ID --user-id <Your-User-OCID>
+
+# Create a policy to give the group administrative rights
+oci iam policy create --name "AdminPolicy" --description "Policy for AdminGroup" --statements '["Allow group AdminGroup to manage all-resources in compartment MyNewCompartment"]' --compartment-id "$COMPARTMENT_ID"
+
+# 2. Network Design
+echo "Setting up VCN"
+
+# Create VCN
+VCN_ID=$(oci network vcn create --cidr-block "10.0.0.0/16" --compartment-id "$COMPARTMENT_ID" --display-name "Project1VCN" --query "data.id" --raw-output)
+
+# Create Subnets
+PUBLIC_SUBNET_ID=$(oci network subnet create --vcn-id $VCN_ID --cidr-block "10.0.1.0/24" --compartment-id "$COMPARTMENT_ID" --display-name "PublicSubnet" --query "data.id" --raw-output)
+PRIVATE_SUBNET_ID=$(oci network subnet create --vcn-id $VCN_ID --cidr-block "10.0.2.0/24" --compartment-id "$COMPARTMENT_ID" --display-name "PrivateSubnet" --query "data.id" --raw-output)
+
+# Create Internet Gateway
+IG_ID=$(oci network internet-gateway create --vcn-id $VCN_ID --compartment-id "$COMPARTMENT_ID" --is-enabled true --query "data.id" --raw-output)
+
+# Update Route Table for Public Subnet
+oci network route-table update --rt-id $(oci network subnet get --subnet-id $PUBLIC_SUBNET_ID --query "data.route-table-id" --raw-output) --route-rules "[{\"cidrBlock\":\"0.0.0.0/0\",\"networkEntityId\":\"$IG_ID\"}]"
+
+# 3. Compute Resources
+echo "Launching Compute Instance"
+
+# Launch Compute Instance
+INSTANCE_ID=$(oci compute instance launch --compartment-id "$COMPARTMENT_ID" --shape "VM.Standard.E2.1.Micro" --subnet-id $PUBLIC_SUBNET_ID --image-id <Oracle-Linux-Image-ID> --ssh-authorized-keys-file <Path-to-your-public-SSH-key> --query "data.id" --raw-output)
+
+# 4. Data Storage
+echo "Setting up Block Volume"
+
+# Create Block Volume
+VOLUME_ID=$(oci bv volume create --availability-domain <Your-Availability-Domain> --compartment-id "$COMPARTMENT_ID" --size-in-gbs 50 --query "data.id" --raw-output)
+
+# Attach Block Volume to Instance
+oci compute volume-attachment attach --instance-id $INSTANCE_ID --type "iscsi" --volume-id $VOLUME_ID
+
+# 5. Monitoring
+echo "Setting up Monitoring"
+
+# Create Notification Topic
+TOPIC_ID=$(oci ons topic create --name "ComputeMonitoring" --description "Topic for compute instance monitoring" --compartment-id "$COMPARTMENT_ID" --query "data.topic-id" --raw-output)
+
+# Subscribe to the Notification Topic
+oci ons subscription create --protocol EMAIL --compartment-id "$COMPARTMENT_ID" --topic-id "$TOPIC_ID" --endpoint "$EMAIL"
+
+# Create Alarms for CPU and Memory Utilization
+oci monitoring alarm create --compartment-id "$COMPARTMENT_ID" --metric-compartment-id "$COMPARTMENT_ID" --namespace "oci_computeagent" --query-text "CpuUtilization[5m]{resourceId = '$INSTANCE_ID'}.mean()" --resolution "5m" --pending-duration "5m" --display-name "High CPU Utilization" --severity "CRITICAL" --body "CPU Utilization is too high" --destinations '["'$TOPIC_ID'"]' --threshold "85" --comparison-operator "GT"
+oci monitoring alarm create --compartment-id "$COMPARTMENT_ID" --metric-compartment-id "$COMPARTMENT_ID" --namespace "oci_computeagent" --query-text "MemoryUtilization[5m]{resourceId = '$INSTANCE_ID'}.mean()" --resolution "5m" --pending-duration "5m" --display-name "High Memory Utilization" --severity "CRITICAL" --body "Memory Utilization is too high" --destinations '["'$TOPIC_ID'"]' --threshold "90" --comparison-operator "GT"
+
+echo "Setup Complete!"
+
+
+

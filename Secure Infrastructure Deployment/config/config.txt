@@ -1,0 +1,47 @@
+--------------------------
+CONFIGURATION DOCUMENT
+Project 1: Secure Cloud Infrastructure Deployment on OCI
+--------------------------
+
+PREREQUISITES:
+---------------
+1. OCI Account: Ensure you have an active Oracle Cloud Infrastructure account. If using a Free Tier, be aware of the limitations.
+2. OCI CLI: Ensure the OCI CLI is installed and configured on your machine.
+3. SSH Key Pair: Have an SSH key pair ready for accessing compute instances. If you don't have one, generate it using ssh-keygen.
+
+CONFIGURATION STEPS:
+---------------------
+1. SET ENVIRONMENT VARIABLES:
+   - OCI_COMPARTMENT_ID: Your OCI compartment ID where resources will be created.
+   - OCI_REGION: The region for deployment (e.g., us-ashburn-1).
+   - OCI_USER_OCID: Your OCI user OCID.
+   - OCI_TENANCY_OCID: Your OCI tenancy OCID.
+   (Set these in your shell or in a .env file)
+
+2. API KEYS:
+   - Configure API keys for OCI user for CLI and SDK operations. Follow the official guide for setup.
+
+3. VCN CONFIGURATION:
+   - Decide CIDR blocks for VCN and subnets. Script uses 10.0.0.0/16 for VCN.
+
+4. COMPUTE CONFIGURATION:
+   - Choose compute instance shape. Script uses VM.Standard.E2.1.Micro for Free Tier.Make sure that 
+   - Have path to public SSH key ready for input.
+
+5. SECURITY CONFIGURATION:
+   - Decide security rules. Script allows SSH access from all IPs. Consider restricting to your IP.
+
+6. MONITORING CONFIGURATION:
+   - Have an email ready for monitoring alarm notifications.
+
+RUNNING THE SCRIPT:
+-------------------
+1. Ensure prerequisites are met and configurations set.
+2. Run the provided script. It guides through the setup, creating OCI resources based on configurations.
+3. Monitor script output for errors or prompts.
+
+POST-DEPLOYMENT:
+-----------------
+1. Review OCI Console for alerts or notifications.
+2. Stay within Free Tier limits to avoid charges (if using Free Tier).
+
